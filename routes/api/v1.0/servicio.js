@@ -75,4 +75,36 @@ router.path(/receta\/[a-z0-9]{1,}$/, (req, res) => {
   });
 });
 
+//actualizar el campo de una receta
+router.put(/receta\/[a-z0-9]{1,}$/, (req, res) => {
+  var url = req.url;
+  var id = url.split("/")[2];
+  var keys  = Object.keys(req.body);
+  var oficialkeys = ['name', 'descripcion', 'ingrediente'];
+  var result = _.difference(oficialkeys, keys);
+  if (result.length > 0) {
+    res.status(400).json({
+      "msn" : "Existe un error en el formato de envio puede hacer uso del metodo patch si desea editar solo un fragmentode la informacion"
+    });
+    return;
+  }
+
+  var recipe = {
+    name : req.body.name,
+    descripcion : req.body.descripcion,
+    ingrediente : req.body.ingrediente
+  };
+  Recipe.findOneAndUpdate({_id: id}, recipe, (err, params) => {
+      if(err) {
+        res.status(500).json({
+          "msn": "Error no se pudo actualizar los datos"
+        });
+        return;
+      }
+      res.status(200).json(params);
+      return;
+  });
+});
+
+
 module.exports = router;
