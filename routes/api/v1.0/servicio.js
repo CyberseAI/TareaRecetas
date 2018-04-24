@@ -106,5 +106,45 @@ router.put(/receta\/[a-z0-9]{1,}$/, (req, res) => {
   });
 });
 
+//Añadir ingrediente
+router.post("/ingredients", (req, res) => {
+  var ingredient = {
+    name : req.body.name,
+    kcal : req.body.kcal,
+    peso : req.body.peso
+  };
+
+  var ingredientData = new Ingredient(ingredient);
+
+  ingredientData.save().then( () => {
+    //content-type
+    res.status(200).json({
+      "msn" : "Ingrediente registrado con exito "
+    });
+  });
+});
+
+//lectura de ingredientes
+router.get("/ingredients", (req, res, next) => {
+  Ingredient.find({}).exec( (error, docs) => {
+    res.status(200).json(docs);
+  })
+});
+
+// Lectura de un solo ingrediente
+router.get(/ingredients\/[a-z0-9]{1,}$/, (req, res) => {
+  var url = req.url;
+  var id = url.split("/")[2];
+  Ingredient.findOne({_id : id}).exec( (error, docs) => {
+    if (docs != null) {
+        res.status(200).json(docs);
+        return;
+    }
+
+    res.status(200).json({
+      "msn" : "No existe el ingrediente"
+    });
+  })
+});
 
 module.exports = router;
