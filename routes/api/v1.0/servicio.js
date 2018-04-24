@@ -147,4 +147,44 @@ router.get(/ingredients\/[a-z0-9]{1,}$/, (req, res) => {
   })
 });
 
+//eliminacion de  ingrediente
+router.delete(/ingredients\/[a-z0-9]{1,}$/, (req, res) => {
+  var url = req.url;
+  var id = url.split("/")[2];
+  Ingredient.find({_id : id}).remove().exec( (err, docs) => {
+      res.status(200).json(docs);
+  });
+});
+
+
+//Actualización de todos los campos de un ingrediente
+router.put(/ingredients\/[a-z0-9]{1,}$/, (req, res) => {
+  var url = req.url;
+  var id = url.split("/")[2];
+  var keys  = Object.keys(req.body);
+  var oficialkeys = ['name', 'kcal', 'peso'];
+  var result = _.difference(oficialkeys, keys);
+  if (result.length > 0) {
+    res.status(400).json({
+      "msn" : "Existe un error en el formato de envio puede hacer uso del metodo patch si desea editar solo un fragmentode la informacion"
+    });
+    return;
+  }
+
+  var ingredient = {
+    name : req.body.name,
+    kcal : req.body.kcal,
+    peso : req.body.peso
+  };
+  Ingredient.findOneAndUpdate({_id: id}, ingredient, (err, params) => {
+      if(err) {
+        res.status(500).json({
+          "msn": "Error no se pudo actualizar los datos"
+        });
+        return;
+      }
+      res.status(200).json(params);
+      return;
+  });
+});
 module.exports = router;
