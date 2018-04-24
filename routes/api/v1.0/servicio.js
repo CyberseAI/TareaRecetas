@@ -54,4 +54,25 @@ router.delete(/receta\/[a-z0-9]{1,}$/, (req, res) => {
 });
 
 //actualizar receta
+router.path(/receta\/[a-z0-9]{1,}$/, (req, res) => {
+  var url = req.url;
+  var id = url.split("/")[2];
+  var keys = Object.keys(req.body);
+  var recipe = {};
+  for(var i=0;i<keys.length;i++
+  {
+    recipe[keys[i]]=req.body[keys[i]];
+  }
+  receta.findOneAndUpdate({_id: id}, recipe, (err, params) => {
+    if(err)
+    {
+      res.status(500).json({
+        "msn" : "Error no se pudo actualizar los datos"
+      }):
+    }
+    res.status(200).json(params);
+    return;
+  });
+});
+
 module.exports = router;
